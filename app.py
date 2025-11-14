@@ -43,6 +43,11 @@ def init_db():
         ''')
 
 
+# 在应用启动时自动初始化数据库（适用于生产环境）
+# 这样无论是开发环境还是生产环境（gunicorn）都能确保数据库表存在
+init_db()
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """主页：显示表单和所有记录"""
@@ -107,10 +112,9 @@ def clear_all():
 
 
 if __name__ == '__main__':
-    # 首次运行初始化数据库
-    init_db()
     # 启动开发服务器
     # macOS 上 5000 端口常被 AirPlay Receiver 占用，改用 5001
+    # 注意：数据库初始化已经在模块级别完成，这里不需要再次调用
     port = int(os.environ.get('PORT', 5001))
     app.run(debug=True, host='0.0.0.0', port=port)
 
