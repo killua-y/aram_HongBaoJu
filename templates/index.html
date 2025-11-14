@@ -112,7 +112,7 @@
                         <tbody>
                             {% for r in records %}
                                 <tr>
-                                    <td class="time">{{ r['created_at'][:16] }}</td>
+                                    <td class="time">{{ r['created_at'][:16] if r['created_at'] else '-' }}</td>
                                     <td class="name">{{ r['name'] }}</td>
                                     <td class="amount {% if r['amount'] > 0 %}positive{% elif r['amount'] < 0 %}negative{% endif %}">
                                         {{ "%.2f"|format(r['amount']) }}

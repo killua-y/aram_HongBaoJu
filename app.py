@@ -140,10 +140,31 @@ def index():
                 summary = cursor.fetchall()
             finally:
                 cursor.close()
+            
+            # 将 PostgreSQL 的 datetime 对象转换为字符串
+            # PostgreSQL 返回的是 datetime 对象，需要转换为字符串以便模板使用
+            processed_records = []
+            for record in records:
+                record_dict = dict(record)
+                # 将 datetime 对象转换为字符串（格式：YYYY-MM-DD HH:MM:SS）
+                if isinstance(record_dict.get('created_at'), datetime):
+                    record_dict['created_at'] = record_dict['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+                # 确保 created_at 是字符串类型
+                elif record_dict.get('created_at'):
+                    record_dict['created_at'] = str(record_dict['created_at'])
+                processed_records.append(record_dict)
+            records = processed_records
         else:
             records = conn.execute(
                 'SELECT * FROM records ORDER BY created_at DESC LIMIT 100'
             ).fetchall()
+            
+            # SQLite 返回的是字符串，转换为字典格式以保持一致性
+            processed_records = []
+            for record in records:
+                record_dict = dict(record)
+                processed_records.append(record_dict)
+            records = processed_records
             
             summary = conn.execute(
                 'SELECT name, SUM(amount) as total FROM records GROUP BY name ORDER BY name'
